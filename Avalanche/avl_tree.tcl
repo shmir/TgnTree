@@ -27,25 +27,42 @@ proc ::TrafficGenerator::Tree::GetChildrenCount {object} {
 
 proc ::TrafficGenerator::Tree::GetChildren {parent} {
 	variable ::TrafficGenerator::Tree::fullTree
-	set children {}
 	if {$fullTree} {
-		set childrenL {}
-		foreach child [::av::get $parent -children] {
-			lappend childrenL [list $child [::av::get $child -name]]
-		}
-		foreach child [lsort -index 1 $childrenL] {
-			append children [join $child \t]\n
-		}
+		set children [::TrafficGenerator::Tree::GetAllChildren $parent]
 	} else {
 		set children [::TrafficGenerator::Tree::GetInterestingChildren $parent]
 	}
-	return [string trim $children]
+
+	set sortedChildren {}
+	foreach child [lsort -index 1 $children] {
+		append sortedChildren [join $child \t]\n
+	}
+	return [string trim $sortedChildren]
+}
+
+proc ::TrafficGenerator::Tree::GetAllChildren {parent} {
+	array set parrent_array [av::get $parent]
+	set allChildren {}
+	foreach {key values} [array get parrent_array] {
+		foreach value $values {
+			if {[regexp {^[a-z]+[0-9]+$} $value] == 1} {
+				if {$key == "-parent" || $key == "-handle"} {
+					continue
+				}
+				if {[catch {av::get $value -name} name] > 0} {
+					set name $value
+				}
+				lappend allChildren [list $value $name] 
+			}
+		}
+	}
+	return $allChildren
 }
 
 proc ::TrafficGenerator::Tree::GetInterestingChildren {parent} {
-	set interestingChildren {}
+	set children {}
 	foreach child  [split [::TrafficGenerator::GetObjectChildren $parent] \n] {
-		append interestingChildren [lindex [split $child \t] 1]\t[lindex [split $child \t] 0]\n
+		lappend interestingChildren [list [lindex [split $child \t] 1] [lindex [split $child \t] 0]]
 	}
 	return $interestingChildren
 }

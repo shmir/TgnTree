@@ -15,44 +15,60 @@ set versionMessage "Traffic Generator Tree 0.9.1\n\nTerra Software Ltd. All righ
 
 set currentConfiguration {}
 
+set t {}
+
 namespace eval TrafficGenerator::Tree {
 
+}
+
+proc ::TrafficGenerator::Tree::Init {} {
+
 	global commonDir
+	global t
 
 	variable inProc 0
 	variable attributesTableKeys {Name Value Type ReadOnly Description}
 
 	variable bgColor white
 
-	wm title . "Traffic Objects Tree"
-
 	image create photo applicationIcon -file [file join $commonDir tree IgnisIcon.png]
 	image create photo classIcon -file [file join $commonDir tree Class16.png]
 
-	wm iconphoto . -default applicationIcon
+	if {$t == {}} {
+		wm title . "Traffic Objects Tree"	
+		wm iconphoto . -default applicationIcon
+	} else {
+		wm title $t "Traffic Objects Tree"	
+		wm iconphoto $t -default applicationIcon
+	}		
 
 }
 
 proc ::TrafficGenerator::Tree::ClearTree {} {
+
 	global curObjRef
+	global t
+
 	set curObjRef {}
-	destroy .main_P
+	destroy $t.main_P
 	foreach instance [::struct::record show instance ::TrafficGenerator::attribute_Record] {
 		::struct::record delete instance $instance
 	}
+
 }
 
 proc ::TrafficGenerator::Tree::BuildView {} {
 
 	global curObjRef
+	global t
 
 	variable ::TrafficGenerator::Tree::bgColor
 
 	::TrafficGenerator::Tree::ClearTree
 
 	# Main paned window for the application.
-	::ttk::panedwindow .main_P -orient horizontal
-	pack .main_P -side top -fill both -expand 1
+	::ttk::panedwindow $t.main_P -orient horizontal
+	pack $t.main_P -side top -fill both -expand 1
 
 	# Menu bar.
 	addMenuBar
@@ -64,47 +80,47 @@ proc ::TrafficGenerator::Tree::BuildView {} {
 	# Selected object attributes frame - label, entry and paned window.
 	#
 
-	frame .main_P.data_F -bd 2 -relief ridge
-	.main_P add .main_P.data_F
+	frame $t.main_P.data_F -bd 2 -relief ridge
+	.main_P add $t.main_P.data_F
 
-	label .main_P.data_F.objRef_L -relief ridge -text "Object reference"
-	entry .main_P.data_F.objRef_E -textvariable curObjRef -state readonly -readonlybackground $bgColor
-	::ttk::panedwindow .main_P.data_F.data_P -orient vertical
+	label $t.main_P.data_F.objRef_L -relief ridge -text "Object reference"
+	entry $t.main_P.data_F.objRef_E -textvariable curObjRef -state readonly -readonlybackground $bgColor
+	::ttk::panedwindow $t.main_P.data_F.data_P -orient vertical
 
-	grid .main_P.data_F.objRef_L .main_P.data_F.objRef_E -sticky nsew
-	grid .main_P.data_F.data_P -sticky nsew -columnspan 2
-	grid columnconfigure .main_P.data_F 1 -weight 1
-	grid rowconfigure .main_P.data_F 1 -weight 1
+	grid $t.main_P.data_F.objRef_L $t.main_P.data_F.objRef_E -sticky nsew
+	grid $t.main_P.data_F.data_P -sticky nsew -columnspan 2
+	grid columnconfigure $t.main_P.data_F 1 -weight 1
+	grid rowconfigure $t.main_P.data_F 1 -weight 1
 
 	#
 	# Attributes table - frame with table and x/y scrollbars.
 	#
 
 	# Frame.
-	frame .main_P.data_F.data_P.attributes_F -relief ridge
-	.main_P.data_F.data_P add .main_P.data_F.data_P.attributes_F
+	frame $t.main_P.data_F.data_P.attributes_F -relief ridge
+	.main_P.data_F.data_P add $t.main_P.data_F.data_P.attributes_F
 
 	# Table
-	tablelist::tablelist .main_P.data_F.data_P.attributes_F.attributes_T -columntitles "Name Value" -stretch all -background $bgColor -labelcommand tablelist::sortByColumn
+	tablelist::tablelist $t.main_P.data_F.data_P.attributes_F.attributes_T -columntitles "Name Value" -stretch all -background $bgColor -labelcommand tablelist::sortByColumn
 
 	# Menue
-	menu .main_P.data_F.data_P.attributes_F.copy_M -tearoff 0
+	menu $t.main_P.data_F.data_P.attributes_F.copy_M -tearoff 0
 	.main_P.data_F.data_P.attributes_F.copy_M add command -label "Copy Attribute name" -command {::TrafficGenerator::Tree::CopyAttrToClipboard $curAttrName}
 	.main_P.data_F.data_P.attributes_F.copy_M add command -label "Copy Attribute value" -command {::TrafficGenerator::Tree::CopyAttrToClipboard $curAttrValue}
 
 	# Scroll bars.
-	ttk::scrollbar .main_P.data_F.data_P.attributes_F.x_S -orient horizontal -command ".main_P.data_F.data_P.attributes_F.attributes_T xview"
-	ttk::scrollbar .main_P.data_F.data_P.attributes_F.y_S -orient vertical -command ".main_P.data_F.data_P.attributes_F.attributes_T yview"
+	ttk::scrollbar $t.main_P.data_F.data_P.attributes_F.x_S -orient horizontal -command ".main_P.data_F.data_P.attributes_F.attributes_T xview"
+	ttk::scrollbar $t.main_P.data_F.data_P.attributes_F.y_S -orient vertical -command ".main_P.data_F.data_P.attributes_F.attributes_T yview"
 	.main_P.data_F.data_P.attributes_F.attributes_T config -xscroll ".main_P.data_F.data_P.attributes_F.x_S set" -yscrollcommand ".main_P.data_F.data_P.attributes_F.y_S set"
 
-	autoscroll::autoscroll .main_P.data_F.data_P.attributes_F.x_S
-	autoscroll::autoscroll .main_P.data_F.data_P.attributes_F.y_S
+	autoscroll::autoscroll $t.main_P.data_F.data_P.attributes_F.x_S
+	autoscroll::autoscroll $t.main_P.data_F.data_P.attributes_F.y_S
 
 	# Pack it all together in the frame.
-	grid .main_P.data_F.data_P.attributes_F.attributes_T .main_P.data_F.data_P.attributes_F.y_S -sticky nsew
-	grid .main_P.data_F.data_P.attributes_F.x_S -sticky nsew
-	grid columnconfigure .main_P.data_F.data_P.attributes_F 0 -weight 1
-	grid rowconfigure .main_P.data_F.data_P.attributes_F 0 -weight 1
+	grid $t.main_P.data_F.data_P.attributes_F.attributes_T $t.main_P.data_F.data_P.attributes_F.y_S -sticky nsew
+	grid $t.main_P.data_F.data_P.attributes_F.x_S -sticky nsew
+	grid columnconfigure $t.main_P.data_F.data_P.attributes_F 0 -weight 1
+	grid rowconfigure $t.main_P.data_F.data_P.attributes_F 0 -weight 1
 
 	# Bind attributes operations.
 
@@ -113,7 +129,7 @@ proc ::TrafficGenerator::Tree::BuildView {} {
 	}
 
 	bind [.main_P.data_F.data_P.attributes_F.attributes_T bodytag] <Button-3> {
-		::TrafficGenerator::Tree::ShowPopUpMenu .main_P.data_F.data_P.attributes_F.attributes_T .main_P.data_F.data_P.attributes_F.copy_M %x %y
+		::TrafficGenerator::Tree::ShowPopUpMenu $t.main_P.data_F.data_P.attributes_F.attributes_T $t.main_P.data_F.data_P.attributes_F.copy_M %x %y
 	}
 
 	#
@@ -121,27 +137,29 @@ proc ::TrafficGenerator::Tree::BuildView {} {
 	#
 
 	# Frame.
-	frame .main_P.data_F.data_P.attribute_F -relief ridge
-	.main_P.data_F.data_P add .main_P.data_F.data_P.attribute_F
+	frame $t.main_P.data_F.data_P.attribute_F -relief ridge
+	.main_P.data_F.data_P add $t.main_P.data_F.data_P.attribute_F
 
-	tablelist::tablelist .main_P.data_F.data_P.attribute_F.attribute_T -columntitles {{ } { }} -stretch all -background $bgColor
+	tablelist::tablelist $t.main_P.data_F.data_P.attribute_F.attribute_T -columntitles {{ } { }} -stretch all -background $bgColor
 
-	ttk::scrollbar .main_P.data_F.data_P.attribute_F.x_S -orient horizontal -command ".main_P.data_F.data_P.attribute_F.attribute_T xview"
-	ttk::scrollbar .main_P.data_F.data_P.attribute_F.y_S -orient vertical -command ".main_P.data_F.data_P.attribute_F.attribute_T yview"
+	ttk::scrollbar $t.main_P.data_F.data_P.attribute_F.x_S -orient horizontal -command ".main_P.data_F.data_P.attribute_F.attribute_T xview"
+	ttk::scrollbar $t.main_P.data_F.data_P.attribute_F.y_S -orient vertical -command ".main_P.data_F.data_P.attribute_F.attribute_T yview"
 	.main_P.data_F.data_P.attribute_F.attribute_T config -xscroll ".main_P.data_F.data_P.attribute_F.x_S set" -yscrollcommand ".main_P.data_F.data_P.attribute_F.y_S set"
 
-	autoscroll::autoscroll .main_P.data_F.data_P.attribute_F.x_S
-	autoscroll::autoscroll .main_P.data_F.data_P.attribute_F.y_S
+	autoscroll::autoscroll $t.main_P.data_F.data_P.attribute_F.x_S
+	autoscroll::autoscroll $t.main_P.data_F.data_P.attribute_F.y_S
 
 	# Pack it all together in the frame.
-	grid .main_P.data_F.data_P.attribute_F.attribute_T .main_P.data_F.data_P.attribute_F.y_S -sticky nsew
-	grid .main_P.data_F.data_P.attribute_F.x_S -sticky nsew
-	grid columnconfigure .main_P.data_F.data_P.attribute_F 0 -weight 1
-	grid rowconfigure .main_P.data_F.data_P.attribute_F 0 -weight 1
+	grid $t.main_P.data_F.data_P.attribute_F.attribute_T $t.main_P.data_F.data_P.attribute_F.y_S -sticky nsew
+	grid $t.main_P.data_F.data_P.attribute_F.x_S -sticky nsew
+	grid columnconfigure $t.main_P.data_F.data_P.attribute_F 0 -weight 1
+	grid rowconfigure $t.main_P.data_F.data_P.attribute_F 0 -weight 1
 
 }
 
 proc ::TrafficGenerator::Tree::InsertRoot {id text} {
+	global t
+	
 	if {[.main_P.tree_F.objects_T exists $id]} {
 		.main_P.tree_F.objects_T delete $id
 	}
@@ -272,6 +290,8 @@ proc ::TrafficGenerator::Tree::CopyAttrToClipboard {stringToCopy} {
 
 proc addObjectsTree {} {
 
+	global t
+
 	#
 	# Objects tree - frame with tree and x/y scrollbars.
 	# There is a bug in autoscroll and it does not work well with treeview unless you set -stretch no.
@@ -280,40 +300,40 @@ proc addObjectsTree {} {
 	#
 
 	# Frame
-	frame .main_P.tree_F -bd 2 -relief ridge
-	.main_P add .main_P.tree_F
+	frame $t.main_P.tree_F -bd 2 -relief ridge
+	.main_P add $t.main_P.tree_F
 
 	# Tree.
-	ttk::treeview .main_P.tree_F.objects_T -selectmode browse -show tree
+	ttk::treeview $t.main_P.tree_F.objects_T -selectmode browse -show tree
 
 	# Small menu attached to tree.
-	menu .main_P.tree_F.objects_T.info_M -tearoff 0
+	menu $t.main_P.tree_F.objects_T.info_M -tearoff 0
 	.main_P.tree_F.objects_T.info_M add command -label "Copy Object Reference To Clipboard" -command {::TrafficGenerator::Tree::CopyObjRefToClipboard}
 
 	# Scroll bars.
-	ttk::scrollbar .main_P.tree_F.y_S -orient vertical -command ".main_P.tree_F.objects_T yview"
-	autoscroll::autoscroll .main_P.tree_F.y_S
+	ttk::scrollbar $t.main_P.tree_F.y_S -orient vertical -command ".main_P.tree_F.objects_T yview"
+	autoscroll::autoscroll $t.main_P.tree_F.y_S
 
 	# Pack it all together in the frame.
 	.main_P.tree_F.objects_T config -yscrollcommand ".main_P.tree_F.y_S set"
-	grid .main_P.tree_F.objects_T .main_P.tree_F.y_S -sticky nsew
-	grid columnconfigure .main_P.tree_F 0 -weight 1
-	grid rowconfigure .main_P.tree_F 0 -weight 1
+	grid $t.main_P.tree_F.objects_T $t.main_P.tree_F.y_S -sticky nsew
+	grid columnconfigure $t.main_P.tree_F 0 -weight 1
+	grid rowconfigure $t.main_P.tree_F 0 -weight 1
 
 	#
 	# Bind tree operations. Open comes before Select.
 	#
 
-	bind .main_P.tree_F.objects_T <<TreeviewOpen>> {
+	bind $t.main_P.tree_F.objects_T <<TreeviewOpen>> {
 		::TrafficGenerator::Tree::TreeviewOpen [.main_P.tree_F.objects_T selection]
 	}
 
-	bind .main_P.tree_F.objects_T <<TreeviewSelect>> {
+	bind $t.main_P.tree_F.objects_T <<TreeviewSelect>> {
 		::TrafficGenerator::Tree::TreeviewSelect [.main_P.tree_F.objects_T selection]
 	}
 
-	bind .main_P.tree_F.objects_T <Button-3> {
-		::TrafficGenerator::Tree::ShowPopUpMenu .main_P.tree_F.objects_T .main_P.tree_F.objects_T.info_M %x %y
+	bind $t.main_P.tree_F.objects_T <Button-3> {
+		::TrafficGenerator::Tree::ShowPopUpMenu $t.main_P.tree_F.objects_T $t.main_P.tree_F.objects_T.info_M %x %y
 	}
 
 }
@@ -324,27 +344,29 @@ proc addObjectTable {} {
 
 proc addMenuBar {} {
 
-	menu .main_P.mbar
-	. configure -menu .main_P.mbar
+	global t
+
+	menu $t.main_P.mbar
+	. configure -menu $t.main_P.mbar
 
 	set ::TrafficGenerator::Tree::fullTree 1
 
-	menu .main_P.mbar.file_M -tearoff 0
-	.main_P.mbar add cascade -menu .main_P.mbar.file_M -label File -underline 0
+	menu $t.main_P.mbar.file_M -tearoff 0
+	.main_P.mbar add cascade -menu $t.main_P.mbar.file_M -label File -underline 0
 	.main_P.mbar.file_M add command -label "Open configuration" -underline 0 -command {::TrafficGenerator::Tree::OpenConfiguration [set currentConfiguration [tk_getOpenFile -filetypes $fileTypes -initialdir $initialdir]]}
 	.main_P.mbar.file_M add command -label "Reload configuration" -underline 0 -command {::TrafficGenerator::Tree::OpenConfiguration $currentConfiguration}
 	.main_P.mbar.file_M add separator
 	.main_P.mbar.file_M add command -label "Exit" -underline 0 -command {exit}
 
-	menu .main_P.mbar.settings_M -tearoff 0
-	.main_P.mbar add cascade -menu .main_P.mbar.settings_M -label Settings -underline 0
+	menu $t.main_P.mbar.settings_M -tearoff 0
+	.main_P.mbar add cascade -menu $t.main_P.mbar.settings_M -label Settings -underline 0
 	.main_P.mbar.settings_M add radiobutton -label "Full Tree" -underline 0 -variable ::TrafficGenerator::Tree::fullTree -value 1
 	.main_P.mbar.settings_M add radiobutton -label "Partial Tree" -underline 0 -variable ::TrafficGenerator::Tree::fullTree -value 0
 	.main_P.mbar.settings_M add separator
 	.main_P.mbar.settings_M add command -label "Unfreeze" -underline 0 -command {::TrafficGenerator::Tree::unfreezeTree}
 
-	menu .main_P.mbar.help_M -tearoff 0
-	.main_P.mbar add cascade -menu .main_P.mbar.help_M -label Help -underline 0
+	menu $t.main_P.mbar.help_M -tearoff 0
+	.main_P.mbar add cascade -menu $t.main_P.mbar.help_M -label Help -underline 0
 	.main_P.mbar.help_M add command -label "About" -underline 0 -command {tk_messageBox -type ok -message $versionMessage}
 
 }
