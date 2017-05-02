@@ -18,7 +18,7 @@ proc ::TrafficGenerator::Tree::OpenConfiguration {spf_file} {
 		set project [::av::perform import system1 -file $spf_file]
 		::Avalanche::BuildDefaultNameSpace $project test1
 		::TrafficGenerator::Tree::OpenTree $project [av::get $project -name]
-		}
+	}
 }
 
 proc ::TrafficGenerator::Tree::GetChildrenCount {object} {
@@ -28,7 +28,17 @@ proc ::TrafficGenerator::Tree::GetChildrenCount {object} {
 proc ::TrafficGenerator::Tree::GetChildren {parent} {
 	variable ::TrafficGenerator::Tree::fullTree
 	if {$fullTree} {
-		set children [::TrafficGenerator::Tree::GetAllChildren $parent]
+		if {[llength $parent] > 1} {
+			set children {}
+			foreach value $parent {
+				if {[catch {av::get $value -name} name] > 0} {
+					set name $value
+				}
+				lappend children [list $value $name] 
+			}
+		} else {
+			set children [::TrafficGenerator::Tree::GetAllChildren $parent]
+		}
 	} else {
 		set children [::TrafficGenerator::Tree::GetInterestingChildren $parent]
 	}
@@ -44,16 +54,22 @@ proc ::TrafficGenerator::Tree::GetAllChildren {parent} {
 	array set parrent_array [av::get $parent]
 	set allChildren {}
 	foreach {key values} [array get parrent_array] {
+		if {[llength $values] > 1 && [regexp {^[a-z]+[0-9]+$} [lindex $values 0]] == 1} {
+			lappend allChildren [list [join $values] [string range $key 1 end]] 
+		} else {
 		foreach value $values {
 			if {[regexp {^[a-z]+[0-9]+$} $value] == 1} {
 				if {$key == "-parent" || $key == "-handle"} {
 					continue
 				}
-				if {[catch {av::get $value -name} name] > 0} {
+				if {[catch {av::get $value -name} name] == 0} {
+				} elseif {[catch {av::get $value -label} name] == 0} {
+				} else {
 					set name $value
 				}
 				lappend allChildren [list $value $name] 
 			}
+		}
 		}
 	}
 	return $allChildren
@@ -69,6 +85,9 @@ proc ::TrafficGenerator::Tree::GetInterestingChildren {parent} {
 
 proc ::TrafficGenerator::Tree::GetAttributes {object} {	
 	global objectDescription
+	if {[llength $object] > 1} {
+		return {}
+	}
 	set objectDescription [::Avalanche::GetDescriptionClass $object]
 	set attributes {}
 	foreach attr [split [string trim [lindex [::textutil::split::splitx [::Avalanche::GetDescription $object] ListDelimiter] 2]] \n] {

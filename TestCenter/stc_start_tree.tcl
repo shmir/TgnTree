@@ -1,23 +1,24 @@
 
-package req inifile
+set tgnTreeRoot 	[file dirname [file dirname [info script]]]
+set commonDir		$tgnTreeRoot/Common
+set testCenterDir	$tgnTreeRoot/TestCenter
 
-set auxToolsRoot [file dirname [file dirname [info script]]]
-set iniFilePath [file join $auxToolsRoot TclAuxTools.ini]
+# TO BE DEFINED BY THE USER
+#
+# Avalanche client install path.
+set stcInstallDir "C:/Program Files (x86)/Spirent Communications/Spirent TestCenter 4.71"
+# Initial directory to Browse for Avalanche configuration files (spf). 
+set initialdir		$testCenterDir
+#
+# EDO NOT CHANGE AFTER THIS POINT
 
-set commonDir		$auxToolsRoot/Common
-set testCenterDir	$auxToolsRoot/TestCenter
-
-set ini [::ini::open $iniFilePath]
-set stc_install_dir [::ini::value $ini STC install_dir]
-set initialdir		[::ini::value $ini STC initial_dir $testCenterDir]
-
-set stc_tcl_dir [file join $stc_install_dir Tcl/lib/]
-if {[file exists $stc_tcl_dir]} {
-	if {[lsearch $auto_path $stc_tcl_dir] == -1} {
-		lappend auto_path $stc_tcl_dir
+set stcTclDir [file join $stcInstallDir Tcl/lib/]
+if {[file exists $stcTclDir]} {
+	if {[lsearch $auto_path $stcTclDir] == -1} {
+		lappend auto_path $stcTclDir
 	}
 } else {
-	set dir [file join $stc_install_dir "Spirent TestCenter Application"]
+	set dir [file join $stcInstallDir "Spirent TestCenter Application"]
 	source [file join $dir pkgIndex.tcl]	
 }
 package require SpirentTestCenter

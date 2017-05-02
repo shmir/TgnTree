@@ -1,17 +1,18 @@
 
-package req inifile
-
-set tgnTreeRoot [file dirname [file dirname [info script]]]
-set iniFilePath [file join $tgnTreeRoot TclAuxTools.ini]
-
+set tgnTreeRoot 	[file dirname [file dirname [info script]]]
 set commonDir		$tgnTreeRoot/Common
 set avalancheDir	$tgnTreeRoot/Avalanche
 
-set ini [::ini::open $iniFilePath]
-set avl_install_dir [::ini::value $ini AVL install_dir]
-set initialdir		[::ini::value $ini AVL initial_dir $avalancheDir]
+# TO BE DEFINED BY THE USER
+#
+# Avalanche client install path.
+set avlInstallDir "C:/Program Files (x86)/Spirent Communications/Spirent TestCenter 4.71"
+# Initial directory to Browse for Avalanche configuration files (spf). 
+set initialdir		$avalancheDir
+#
+# EDO NOT CHANGE AFTER THIS POINT
 
-lappend auto_path [file join $avl_install_dir "Layer 4-7 Application/TclAPI"]
+lappend auto_path [file join $avlInstallDir "Layer 4-7 Application/TclAPI"]
 package require av
 av::login temp-workspace-[expr {round(rand()*1000)}]
 

@@ -166,7 +166,7 @@ proc ::TrafficGenerator::Tree::InsertRoot {id text} {
 	.main_P.tree_F.objects_T insert {} end -id $id -text $text -image classIcon
 }
 
-# There are object references with spaces so children is LINE\TAB seperated list..
+# There are object references with spaces so children is LINE\TAB separated list..
 proc ::TrafficGenerator::Tree::InsertChildren {parent children} {
 	.main_P.tree_F.objects_T delete [.main_P.tree_F.objects_T children [string map {\\ {}} $parent]]
 	foreach child [split $children \n] {
@@ -174,6 +174,10 @@ proc ::TrafficGenerator::Tree::InsertChildren {parent children} {
 		set name [lindex [split $child \t] 1]
 		if {$name == {}} {
 			set name $id
+		}
+		# If this ID already exists - remove it from the other branch can happen in Avalanche which is not clean tree).
+		if {[.main_P.tree_F.objects_T exists $id]} {
+			.main_P.tree_F.objects_T delete $id
 		}
 		.main_P.tree_F.objects_T insert [string map {\\ {}} $parent] end -id $id -text $name -image classIcon
 	}
@@ -189,7 +193,7 @@ proc ::TrafficGenerator::Tree::TreeviewOpen {node} {
 	::TrafficGenerator::Tree::freezeTree
 	::TrafficGenerator::Tree::InsertChildren [join $node] [::TrafficGenerator::Tree::GetChildren [join $node]]
 	foreach child [.main_P.tree_F.objects_T children [string map {\\ {}} [join $node]]] {
-		if {[::TrafficGenerator::Tree::GetChildrenCount $child] > 0} {
+		if {[llength $child] || [::TrafficGenerator::Tree::GetChildrenCount $child] > 0} {
 			::TrafficGenerator::Tree::InsertChildren $child ${child}-dummy
 		}
 	}
@@ -200,7 +204,7 @@ proc ::TrafficGenerator::Tree::TreeviewOpen {node} {
 
 proc ::TrafficGenerator::Tree::TreeviewSelect {node} {
 	variable ::TrafficGenerator::Tree::inProc
-	# If in the middle of Open - igon.
+	# If in the middle of Open - ignore.
 	if {$inProc} {
 		return
 	}
