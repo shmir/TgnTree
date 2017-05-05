@@ -1,17 +1,18 @@
 
-package req inifile
+set tgnTreeRoot [file dirname [file dirname [info script]]]
+set commonDir $tgnTreeRoot/Common
+set ixNetworkDir $tgnTreeRoot/IxNetwork
 
-set auxToolsRoot [file dirname [file dirname [info script]]]
-set iniFilePath [file join $auxToolsRoot TclAuxTools.ini]
+# TO BE DEFINED BY THE USER
+#
+# IxNetwork client install path.
+set ixnInstallDir "C:/Program Files (x86)/Ixia/IxNetwork/8.01-GA"
+# Initial directory to Browse for IxNetwork configuration files (ixncfg). 
+set initialdir $ixNetworkDir
+#
+# EDO NOT CHANGE AFTER THIS POINT
 
-set commonDir		$auxToolsRoot/Common
-set ixNetworkDir	$auxToolsRoot/IxNetwork
-
-set ini [::ini::open $iniFilePath]
-set ixn_install_dir [::ini::value $ini IXN install_dir]
-set initialdir		[::ini::value $ini IXN initial_dir $ixNetworkDir]
-
-source  [file join $ixn_install_dir TclScripts/lib/IxTclNetwork/pkgIndex.tcl] 
+source  [file join $ixnInstallDir TclScripts/lib/IxTclNetwork/pkgIndex.tcl] 
 set version [package require IxTclNetwork]
 ixNet connect localhost -port 8009 -version $version
 

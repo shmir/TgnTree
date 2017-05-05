@@ -8,7 +8,7 @@ set avalancheDir	$tgnTreeRoot/Avalanche
 # Avalanche client install path.
 set avlInstallDir "C:/Program Files (x86)/Spirent Communications/Spirent TestCenter 4.71"
 # Initial directory to Browse for Avalanche configuration files (spf). 
-set initialdir		$avalancheDir
+set initialdir $avalancheDir
 #
 # EDO NOT CHANGE AFTER THIS POINT
 

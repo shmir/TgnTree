@@ -7,8 +7,8 @@ set testCenterDir	$tgnTreeRoot/TestCenter
 #
 # Avalanche client install path.
 set stcInstallDir "C:/Program Files (x86)/Spirent Communications/Spirent TestCenter 4.71"
-# Initial directory to Browse for Avalanche configuration files (spf). 
-set initialdir		$testCenterDir
+# Initial directory to Browse for STC configuration files (tcc/xml). 
+set initialdir $testCenterDir
 #
 # EDO NOT CHANGE AFTER THIS POINT
 
