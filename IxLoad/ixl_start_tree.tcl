@@ -1,3 +1,6 @@
+#!/bin/sh
+# A Tcl comment, whose contents don't matter \
+exec wish85 "$0" "$@"
 
 set tgnTreeRoot [file dirname [file dirname [info script]]]
 set commonDir $tgnTreeRoot/Common
@@ -11,6 +14,10 @@ set ixlInstallDir "C:/Program Files (x86)/Ixia/IxLoad/8.01-GA"
 set initialdir $ixLoadDir
 #
 # EDO NOT CHANGE AFTER THIS POINT
+
+if {[llength $argv] > 0} {
+	set ixlInstallDir [lindex $argv 0]
+}
 
 source [file join $ixlInstallDir TclScripts/bin/IxiaWish.tcl]
 package require IxLoad

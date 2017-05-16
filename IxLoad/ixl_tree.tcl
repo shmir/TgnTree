@@ -37,8 +37,6 @@ proc ::TrafficGenerator::Tree::GetChildren {parent} {
 				append children $child\t[$child cget -name]\n
 			}
 			return [string trim $children]
-		} else {
-			puts "zzz $indexCount"
 		}
 	}
 
@@ -56,8 +54,6 @@ proc ::TrafficGenerator::Tree::GetChildren {parent} {
 				append children $value\t$option\n
 			}
 		}
-	} else {
-		puts "aaa $options $parent"
 	}
 
 	return [string trim $children]
@@ -75,9 +71,8 @@ proc ::TrafficGenerator::Tree::GetAttributes {object} {
 			set name [string range $option 1 end]
 			lappend attributes [::TrafficGenerator::Tree::AddAttributeRecord $object $name [$object cget -$name]]
 		}
-	} else {
-		puts "bbb $options $parent"
 	}
+
 	return $attributes
 }
 
