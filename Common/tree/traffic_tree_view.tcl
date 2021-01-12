@@ -1,10 +1,3 @@
-# E - Entry
-# F - Frame
-# L - Label
-# M - Menu
-# P - Pane
-# S - Scroll bar
-# T - Tree or Table
 
 #
 # Sometimes we use tile (ttk) and sometimes standard widgets, depends on what's quicker to learn and implement.
@@ -251,6 +244,16 @@ proc ::TrafficGenerator::Tree::CopyObjRefToClipboard {} {
 	clipboard append $curObjRef
 }
 
+proc ::TrafficGenerator::Tree::FindInSubtree {} {
+	global curObjRef
+	set object [.main_P.tree_F.objects_T selection]
+	if {$object == {}} {
+		return
+	}
+	clipboard clear
+	clipboard append $curObjRef
+}
+
 proc ::TrafficGenerator::Tree::ShowPopUpMenu {window menu c_x c_y} {
 	set x [expr [winfo rootx $window]+$c_x]
 	set y [expr [winfo rooty $window]+$c_y]
@@ -313,6 +316,7 @@ proc addObjectsTree {} {
 	# Small menu attached to tree.
 	menu $t.main_P.tree_F.objects_T.info_M -tearoff 0
 	.main_P.tree_F.objects_T.info_M add command -label "Copy Object Reference To Clipboard" -command {::TrafficGenerator::Tree::CopyObjRefToClipboard}
+	.main_P.tree_F.objects_T.info_M add command -label "Find" -command {::TrafficGenerator::Tree::FindInSubtree}
 
 	# Scroll bars.
 	ttk::scrollbar $t.main_P.tree_F.y_S -orient vertical -command ".main_P.tree_F.objects_T yview"

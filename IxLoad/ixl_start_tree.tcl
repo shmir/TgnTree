@@ -1,15 +1,17 @@
 #!/bin/sh
-# A Tcl comment, whose contents don't matter \
+# Dummy comment line - part of shebang, do not remove \
 exec wish85 "$0" "$@"
 
-set tgnTreeRoot [file dirname [file dirname [info script]]]
+puts [info script]
+set tgnTreeRoot [file dirname [file dirname [file normalize [info script]]]]
+puts $tgnTreeRoot
 set commonDir $tgnTreeRoot/Common
 set ixLoadDir $tgnTreeRoot/IxLoad
 
 # TO BE DEFINED BY THE USER
 #
 # IxLoad client install path.
-set ixlInstallDir "C:/Program Files (x86)/Ixia/IxLoad/8.01-GA"
+set ixlInstallDir "D:/Program Files (x86)/Ixia/IxLoad/9.00.0.347"
 # Initial directory to Browse for IxLoad configuration files (rxf). 
 set initialdir $ixLoadDir
 #

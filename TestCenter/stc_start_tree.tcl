@@ -1,3 +1,6 @@
+#!/bin/sh
+# Dummy comment line - part of shebang, do not remove \
+exec wish85 "$0" "$@"
 
 set tgnTreeRoot 	[file dirname [file dirname [info script]]]
 set commonDir		$tgnTreeRoot/Common
@@ -11,6 +14,10 @@ set stcInstallDir "C:/Program Files (x86)/Spirent Communications/Spirent TestCen
 set initialdir $testCenterDir
 #
 # EDO NOT CHANGE AFTER THIS POINT
+
+if {[llength $argv] > 0} {
+	set stcInstallDir [lindex $argv 0]
+}
 
 set stcTclDir [file join $stcInstallDir Tcl/lib/]
 if {[file exists $stcTclDir]} {
